@@ -1,6 +1,6 @@
 # Moonlight TV — Vibepollo DualSense Waveform Port
 
-**Status: EXPERIMENTAL source port; no successful webOS cross-build or end-to-end TV/controller test yet.**
+**Status: EXPERIMENTAL source port; testing webOS cross-build end-to-end TV/controller support on LG WEBOS.**
 
 This is a reproducible *overlay project* which creates a separate LG webOS IPK
 from [mariotaku/moonlight-tv](https://github.com/mariotaku/moonlight-tv),
