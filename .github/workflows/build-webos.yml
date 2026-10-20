@@ -16,10 +16,10 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Check out overlay project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Run protocol and overlay tests
-        run: ./scripts/test.sh
+        run: bash ./scripts/test.sh
 
       - name: Install ares packaging and verification tools
         run: sudo apt-get update && sudo apt-get install -y cmake build-essential git python3
@@ -60,7 +60,7 @@ jobs:
         env:
           CI: '1'
           TOOLCHAIN_FILE: /tmp/arm-webos-linux-gnueabi_sdk-buildroot/share/buildroot/toolchainfile.cmake
-        run: ./scripts/build-ipk.sh
+        run: bash ./scripts/build-ipk.sh
 
       - name: Verify IPK presence
         run: test -n "$(find moonlight-tv-worktree/dist -maxdepth 1 -name '*.ipk' -print -quit)"

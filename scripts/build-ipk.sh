@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-"$ROOT/scripts/test.sh"
+bash "$ROOT/scripts/test.sh"
 python3 "$ROOT/scripts/bootstrap.py" --dest "$ROOT/moonlight-tv-worktree"
 cd "$ROOT/moonlight-tv-worktree"
 # TOOLCHAIN_FILE must be a real arm-webos-linux-gnueabi toolchain file.
