@@ -2,6 +2,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
+#include <ControllerHaptics.h>
 #include <SDL_gamecontroller.h>
 
 // Set up before any gamepads or stream callbacks; destroy after stream ends.
