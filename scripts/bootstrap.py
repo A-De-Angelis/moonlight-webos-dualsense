@@ -174,7 +174,7 @@ void app_input_gamepad_set_adaptive_triggers(app_input_t *input, uint16_t contro
         ds5_output_effect_t report = ds5_make_trigger_effect(eventFlags, typeLeft,
                                                               typeRight, left, right);
         int rc = SDL_GameControllerSendEffect(state->controller, &report, sizeof(report));
-        if (rc != 0) SDL_LogWarn(SDL_LOG_CATEGORY_INPUT,
+        if (rc != 0) commons_log_warn("Input",
                                 "DualSense adaptive trigger update failed (slot %u): %s",
                                 controllerNumber, SDL_GetError());
         return;
