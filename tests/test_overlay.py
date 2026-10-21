@@ -30,8 +30,15 @@ class OverlayTests(unittest.TestCase):
                 'set(WEBOS_APPINFO_ID "com.limelight.webos")\n'
             ),
             'src/app/CMakeLists.txt': 'add_subdirectory(input)\nadd_subdirectory(stream)\n',
+            'src/app/input/input_gamepad.h': '#pragma once\n',
+            'src/app/input/input_gamepad.h': '#pragma once\n',
             'src/app/input/input_gamepad.c': (
                 '#include "app_input.h"\n'
+                'static short next_gamepad_gs_id(app_input_t *input);\n'
+                '    SDL_GameControllerRumbleTriggers(input->gamepads[controllerNumber].controller, leftTrigger, rightTrigger,\n'
+                '                                      SDL_HAPTIC_INFINITY);\n'
+                '    app_gamepad_state_t *gamepad = &input->gamepads[controllerNumber];\n'
+                '    SDL_GameControllerSetLED(input->gamepads[controllerNumber].controller, r, g, b);\n'
                 '    SDL_GameControllerClose(state->controller);\n'
                 '    app_gamepad_state_t *state = &input->gamepads[controller_id];\n'
             ),
@@ -46,7 +53,9 @@ class OverlayTests(unittest.TestCase):
             ),
             'src/app/stream/connection/session_connnection.c': (
                 '#include "input/input_gamepad.h"\n'
+                'CONNECTION_LISTENER_CALLBACKS connection_callbacks = {\n'
                 '        .setHdrMode = connection_set_hdr\n'
+                '    current_session = session;\n    return &connection_callbacks;\n'
                 'void session_connection_callbacks_reset(session_t *session) {\n'
             ),
             'deploy/webos/appinfo.json': (
@@ -65,6 +74,23 @@ class OverlayTests(unittest.TestCase):
             cmake = (base/'src/app/CMakeLists.txt').read_text()
             self.assertIn('webos_dualsense/webos_haptics.c', cmake)
             self.assertIn('LI_CCAP_HAPTICS_PCM', (base/'src/app/stream/input/session_gamepad.c').read_text())
+            self.assertIn('setAdaptiveTriggers = connection_adaptive_triggers',
+                          (base/'src/app/stream/connection/session_connnection.c').read_text())
+            self.assertIn('SDL_GameControllerSendEffect',
+                          (base/'src/app/input/input_gamepad.c').read_text())
+            self.assertIn('setAdaptiveTriggers = connection_adaptive_triggers',
+                          (base/'src/app/stream/connection/session_connnection.c').read_text())
+            self.assertIn('SDL_GameControllerSendEffect',
+                          (base/'src/app/input/input_gamepad.c').read_text())
+            self.assertIn('ds5_make_trigger_effect',
+                          (base/'src/app/input/input_gamepad.c').read_text())
+            self.assertIn('webos_find_gamepad_by_slot',
+                          (base/'src/app/input/input_gamepad.c').read_text())
+            self.assertIn('SDL_AtomicAdd(&ds5_connection_generation, 1)',
+                          (base/'src/app/stream/connection/session_connnection.c').read_text())
+            self.assertIn('DS5_MAX_PENDING_TRIGGERS 16', (base/'src/app/stream/connection/session_connnection.c').read_text())
+            self.assertIn('SDL_PushEvent(&post) <= 0',
+                          (base/'src/app/stream/connection/session_connnection.c').read_text())
             self.assertIn('controllerHaptics = webos_haptics_receive',
                           (base/'src/app/stream/connection/session_connnection.c').read_text())
             self.assertEqual((base/'src/app/webos_dualsense/saxense/packet.h').read_bytes(),

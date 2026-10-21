@@ -1,6 +1,6 @@
 # Moonlight TV — Vibepollo DualSense Waveform Port
 
-**Status: EXPERIMENTAL source port; testing webOS cross-build end-to-end TV/controller support on LG WEBOS.**
+**Status: EXPERIMENTAL; GitHub Actions webOS ARM cross-build succeeded (2026-10-20), but no end-to-end TV/controller validation yet.**
 
 This is a reproducible *overlay project* which creates a separate LG webOS IPK
 from [mariotaku/moonlight-tv](https://github.com/mariotaku/moonlight-tv),
@@ -27,6 +27,8 @@ The display name is **Moonlight DS5**.
   gaps, emits silence on normal teardown, handles controller removal, and does
   not let ordinary rumble interrupt active waveform output.
 - Retains the original Moonlight TV streaming pipeline and IPK packaging.
+- Forwards game-specific DualSense adaptive-trigger effects using the host's 0x5503 event and SDL's PS5 HIDAPI report format; effects are delivered on the SDL main thread with a bounded 16-event queue, 250-ms expiry, and rejection of stale cross-session events.
+- Correctly maps incoming controller slot IDs to active SDL gamepad state for rumble, trigger rumble, motion requests and LED changes, including after reconnects.
 
 ### Current restrictions
 
@@ -40,8 +42,8 @@ The display name is **Moonlight DS5**.
   the raw HID device. A TV-specific privilege solution might be necessary.
 - This does not add support for Nonary's PyroWave codec, Windows WASAPI, or Qt
   presentation features. The original webOS client still handles A/V.
-- Adaptive trigger *effects* are not yet handled by the webOS port. Existing
-  ordinary trigger rumble/touchpad support is inherited from Moonlight TV.
+- Adaptive-trigger effects are forwarded through Nonary's 0x5503 callback to SDL's PS5 HIDAPI effect writer. This requires SDL PS5 HIDAPI support on the TV and remains hardware-untested. HID output may conflict with another controller manager (including the OS).
+- Raw controller-speaker audio, microphone, headset audio and USB wired waveform output remain outside the scope of the PCM protocol.
 - TVs that require an x86 or 64-bit ARM native binary need an additional target
   toolchain; the included build is specifically for 32-bit ARM webOS.
 - Rendering correctness, Bluetooth timing, audio drift, multiple devices,
@@ -96,6 +98,8 @@ It avoids building a silently incompatible IPK. A dirty pinned `moonlight-tv-wor
 should be deleted before regenerating it; **do not remove it if it contains your work**.
 
 ## Install and inspect on rooted LG TV
+
+The source package includes `scripts/diagnose-webos-dualsense.sh`. Copy it to the TV and run `sh diagnose-webos-dualsense.sh` under the same privileges as the app where possible. This reports CPU, Bluetooth HID identities, device permissions and writability without modifying any device node.
 
 Use a previously paired TV in webOS Developer Mode or a tool which has root
 installation privileges. Example with an ares device configured as `webos`:
@@ -158,3 +162,21 @@ not a vendored snapshot of third-party projects. The CI workflow bundles all
 submodule contents used in the build as a corresponding-source archive and
 attaches it to tagged pre-releases. Keep that source available whenever you
 publish a binary; review every upstream project's license before distribution.
+
+## Controller attached to Windows PC instead
+
+If your DualSense is paired directly with the Windows streaming PC, Moonlight
+should be used for video/audio streaming only and the game should use the real
+controller directly. Steam Input may need to be disabled per game. Do not add a
+second emulated streamed pad for the same physical controller. Built-in Windows
+Bluetooth does not reliably offer the USB audio endpoint needed by games for
+native 4-channel waveform haptics. For the most reliable native DualSense
+features use a USB-C cable or a compatible bridge that presents a USB DualSense
+to Windows while the actual controller is wireless. Standard Bluetooth still
+works for inputs, and adaptive triggers depend on specific games and drivers.
+No webOS client change can alter how a Windows game talks to a Bluetooth pad
+that is connected directly to Windows. An optional Raspberry Pi Pico 2 W with the
+DS5Dongle bridge firmware is the preferred wireless option when a game needs
+the physical controller to appear as a wired USB DualSense on Windows.
+
+Further detail: [`docs/controller-connection-modes.md`](docs/controller-connection-modes.md).
