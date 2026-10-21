@@ -118,13 +118,13 @@ def apply(dest: pathlib.Path) -> None:
                '#endif', 'map rumble to streamed slot and prevent waveform conflicts')
     patch_file(gamepad_c,
                '    SDL_GameControllerRumbleTriggers(input->gamepads[controllerNumber].controller, leftTrigger, rightTrigger,\n'
-               '                                      SDL_HAPTIC_INFINITY);',
+               '                                     SDL_HAPTIC_INFINITY);',
                '#ifdef TARGET_WEBOS\n'
                '    app_gamepad_state_t *state = webos_find_gamepad_by_slot(input, controllerNumber);\n'
                '    if (state) SDL_GameControllerRumbleTriggers(state->controller, leftTrigger, rightTrigger, SDL_HAPTIC_INFINITY);\n'
                '#else\n'
                '    SDL_GameControllerRumbleTriggers(input->gamepads[controllerNumber].controller, leftTrigger, rightTrigger,\n'
-               '                                      SDL_HAPTIC_INFINITY);\n'
+               '                                     SDL_HAPTIC_INFINITY);\n'
                '#endif', 'safe trigger rumble slot lookup')
     patch_file(gamepad_c,
                '    app_gamepad_state_t *gamepad = &input->gamepads[controllerNumber];',

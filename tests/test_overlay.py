@@ -36,7 +36,7 @@ class OverlayTests(unittest.TestCase):
                 '#include "app_input.h"\n'
                 'static short next_gamepad_gs_id(app_input_t *input);\n'
                 '    SDL_GameControllerRumbleTriggers(input->gamepads[controllerNumber].controller, leftTrigger, rightTrigger,\n'
-                '                                      SDL_HAPTIC_INFINITY);\n'
+                '                                     SDL_HAPTIC_INFINITY);\n'
                 '    app_gamepad_state_t *gamepad = &input->gamepads[controllerNumber];\n'
                 '    SDL_GameControllerSetLED(input->gamepads[controllerNumber].controller, r, g, b);\n'
                 '    SDL_GameControllerClose(state->controller);\n'
